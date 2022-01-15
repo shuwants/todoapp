@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 # It's standard way to create flask application.
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://ShujiKatoMBPro@localhost:5432/example'
+app.config['SQLALCHEMY_TRACK_MODIFICAIONS'] = False
 db = SQLAlchemy(app)
 
 class Person(db.Model):
@@ -13,8 +14,12 @@ class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True) # we don't need __init__ because of these lines.
     name = db.Column(db.String(), nullable=False)
 
+    def __repr__(self) -> str:
+        return f'<Person ID: {self.id}, name: {self.name}>'
+
 db.create_all()
 
 @app.route('/') # "@app.route('/')" = decorator, from here, we can tell our Flask application which endpoint to listen to for connections. This time, we want to listen to the homepage route =(root route '/').
 def index(): # index is a standard name for the route handler that listens for connections to the root route and figures out what to do next.
-    return f'Hello, World!'
+    person = Person.query.first()
+    return f'Hello, ' + person.name + '!'
